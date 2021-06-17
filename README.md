@@ -39,4 +39,4 @@ Can we try with one single neuron first?
 4. Use these values to see parameters for new neurons and run 6 more trials.
 5. Repeat.
 
-> Back to Plan 1. This process means it doesn't matter how many parameters I have, I will just average each pair. OK!
+> Back to Plan 1. This process means it doesn't matter how many parameters I have, I will just average each parameter to seed new iterations of the network. OK!
