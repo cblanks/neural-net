@@ -1,5 +1,7 @@
 # neural-net
 
+A project to help me think about the fundamentals of neural nets.  Aim to build one from scratch to differentiate between two simple b/w images.
+
 ## Plan
 
 1. First layer neurons each receive one input for each array value, from 'cross' or 'plus'.
