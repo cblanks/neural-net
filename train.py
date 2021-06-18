@@ -1,51 +1,63 @@
-"""
-Plan
-----
-First layer neurons each receive one input for each array value, from 'cross' or 'plus'.
-  We will start with three neurons in this layer.
-  Each of these neurons has been initialized with random parameters.
-  Each neuron produces a result.
-Hidden layer neurons (fewer than in first layer) each receive one input from each first layer neuron.
-  We will start with two neurons in this layer.
-  Each of these neurons has been initialized with random parameters.
-  Each neuron produces a result.
-Final layer contains one single neuron that will receive one input from each hidden layer neuron.
-  This neuron has been initialized with random parameters.
-  This neuron will produce a result, 1 for 'cross' and 0 for 'plus'.
+# dependencies
+import math
+import pickle
+from lib.neural_net import NeuralNet
+import data
 
-We have a lot of parameters to optimize here:
-  9 + 1 on each of the 3 first layer neurons = 30
-  3 + 1 on each of the 2 hidden layer neurons = 8
-  2 + 1 on the final layer neuron = 3
-  TOTAL = 41
+# helper functions
 
-> Don't think neuron outputs can be binary otherwise what are we optimizing towards?
 
-Can we try with one single neuron first?
+def rms(X):
+    sum_xx = 0.0
+    for x in X:
+        sum_xx += x*x
 
-Plan 0
-------
-Neuron receives 9 inputs, so 9 weights plus one bias = 10 free parameters, each 0 <= x <= 1.
-Each tanh neuron emits a result in the range -1 to 1.
-Aim that -1 corresponds to 'cross' and 1 to 'plus'.
+    return math.sqrt(sum_xx)
 
-Try 6 independent runs and compare the final results:
-- score = RMS( score_for_cross + 1, 1 - score_for_plus )
 
-From the top 4 (ranked by minimum score) calculate averages of each parameter from all unique pairings:
-- 43, 42, 41, 32, 31, 21
+# options
+nets_per_step = 100
+top_n_nets = 10
 
-Use these values to run 6 more trials.
-Repeat.
+# main
+best_nets = []
+minimal_loss = math.inf
 
-Back to Plan 1. This process means it doesn't matter how many parameters I have, I will just average each pair. OK!
-"""
-from lib.layer import NeuronLayer
-import layer
+n = 0
+while n < 100:
+    n += 1
 
-network_states = []
+    # 1. get outputs from a set of randomly generated networks
+    trials = []
+    for i in range(nets_per_step):
+        nn = NeuralNet(9, [5, 3, 1])
+        if len(best_nets) > 0:
+            nn.deriveFrom(
+                list(map(lambda x: x["net"], best_nets))
+            )
 
-state0 = [
-  NeuronLayer(1)
-]
+        checks = [
+            {"result": nn.getOutput(data.cross), "target": -1},
+            {"result": nn.getOutput(data.plus), "target": 1},
+            {"result": nn.getOutput(data.zero), "target": 0}
+        ]
 
+        trials.append({"net": nn, "score": rms(
+            list(map(lambda x: (x["target"] - x["result"]), checks))
+        )})
+
+    # 2. rank nets by output score, update record of top 10 nets
+    for trials in trials:
+        best_nets.append(trials)
+
+    # print(best_nets)
+    sorted_nets = sorted(best_nets, key=lambda x: x["score"])
+    best_nets = sorted_nets[0:10]
+
+    print(f'Loss: {best_nets[0]["score"]}')
+    if best_nets[0]["score"] < 1e-9:
+        break
+
+# finally save best nn in a pkl file to be used for testing
+with open("trained_network.pkl", "wb") as nn_file:
+    pickle.dump(best_nets[0]["net"], nn_file)

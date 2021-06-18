@@ -40,3 +40,5 @@ Can we try with one single neuron first?
 5. Repeat.
 
 > Back to Plan 1. This process means it doesn't matter how many parameters I have, I will just average each parameter to seed new iterations of the network. OK!
+
+> Am I really training a network or simply finding a network configuration which works? Is there a difference?
