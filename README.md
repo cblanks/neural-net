@@ -45,4 +45,4 @@ Can we try with one single neuron first?
 
 ## TODO
 
-- [ ] Try ReLU vsatan vas sigmoid.
+- [ ] Try ReLU vs. atan vs. sigmoid.
